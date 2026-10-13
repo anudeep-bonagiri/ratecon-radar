@@ -87,9 +87,9 @@ TRACKING = money lost over tracking apps, check calls, or status updates
 ACCESSORIAL = how detention, wait time, layover, or a cancelled truck (TONU) is paid, or that it is not paid
 PAPERWORK = a deadline for the POD, BOL, or invoice that carries a fee, a delay, or non-payment
 PAYMENT = when the carrier is paid, quick pay fees, factoring or assignment rules
-DEDUCTION = other charges, lumper or unloading costs, chargebacks, offsets, all-in rates, losing pay for re-brokering
+DEDUCTION = other charges, lumper or unloading costs, chargebacks, offsets, losing pay for re-brokering, or an all-in rate that already includes waiting, fuel, or other extras
 LIABILITY = cargo damage, shortages, claims, or risk placed on the carrier
-NONE = instructions, contacts, addresses, equipment or insurance requirements, the rate amount, greetings, and any rule that names no fee, pay cut, deadline, or liability
+NONE = instructions, contacts, addresses, equipment requirements, insurance the carrier must carry, the rate amount, greetings, and any rule that names no fee, pay cut, deadline, or liability
 
 Reply on one line as: LABEL | what it means for the driver in plain words, under 20 words.
 Be exact about who pays whom. "Carrier will be paid" means the driver receives money.
