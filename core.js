@@ -71,7 +71,7 @@ export function toUnits(docText) {
 const GATE = /\$|%|\b(fee|fees|fine|fines|fined|charg\w*|deduct\w*|penal\w*|forfeit\w*|withh\w*|reduc\w*|drop\w*|liab\w*|responsib\w*|claim\w*|paid|pay|pays|payment\w*|remit\w*|settle\w*|detention|layover|tonu|not used|cancel\w*|lumper\w*|unload\w*|track\w*|check call\w*|update\w*|visib\w*|late|early|ahead|appointment\w*|miss\w*|invoice\w*|pod|proof of delivery|paperwork|document\w*|receipt\w*|offset|set off|setoff|broker\w*|assign\w*|factor\w*|waive\w*|void\w*|refus\w*|reject\w*|all[- ]in|includ\w*|inclusive|reimburs\w*|expense|cost\w*|bill\w*|wait\w*|delay\w*|free time|net \d+|discount\w*|subcontract\w*|shortage\w*|damage\w*|loss|standby|chargeback\w*|non-?compliance|no-?show)\b/i;
 
 export function passesGate(text) {
-  if (text.split(/\s+/).length < 5) return false;
+  if (text.split(/\s+/).length < 4) return false;
   return GATE.test(text);
 }
 
