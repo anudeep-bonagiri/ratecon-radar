@@ -244,6 +244,7 @@ export function exposure(flags) {
   let hourly = 0;
   for (const f of flags) {
     if (!["ARRIVAL", "TRACKING", "PAPERWORK", "DEDUCTION"].includes(f.label)) continue;
+    if (PAID_TO_CARRIER.test(f.text)) continue; // money paid to the carrier is not a penalty
     for (const a of extractAmounts(f.text)) {
       if (a.value === undefined) continue;
       if (a.perHour) hourly += a.value; else fixed += a.value;
