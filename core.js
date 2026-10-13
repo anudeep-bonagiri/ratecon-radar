@@ -92,6 +92,7 @@ LIABILITY = cargo damage, shortages, claims, or risk placed on the carrier
 NONE = instructions, contacts, addresses, equipment or insurance requirements, the rate amount, greetings, and any rule that names no fee, pay cut, deadline, or liability
 
 Reply on one line as: LABEL | what it means for the driver in plain words, under 20 words.
+Be exact about who pays whom. "Carrier will be paid" means the driver receives money.
 If the label is NONE reply with only: NONE`;
 
 // Few-shot examples. None of these sentences appear in the evaluation documents.
@@ -107,6 +108,8 @@ const JUDGE_SHOTS = [
   ["Pickup number is 44021 and the dock opens at 6 am.", "NONE"],
   ["Broker may subtract any fine from money owed on other loads.", "DEDUCTION | The broker can take fines out of your pay on other loads."],
   ["Carrier is responsible for all damage to the freight until it is delivered.", "LIABILITY | Any damage before delivery is on you."],
+  ["Should the shipment cancel once the truck is on its way, carrier will be paid $100.", "ACCESSORIAL | If the load cancels after you roll, you are paid $100."],
+  ["This is an all-inclusive rate and no extra charges will be accepted.", "DEDUCTION | The rate covers everything, so you cannot bill extra for waiting, fuel, or stops."],
 ];
 
 export function judgeMessages(unit) {
@@ -163,9 +166,15 @@ export function parseFacts(raw, docText) {
     v = String(v).trim();
     // A value only counts as verified if the document really contains it.
     let verified = hay.includes(v.toLowerCase().replace(/\s+/g, " "));
-    if (!verified && (k === "total_pay" || k === "miles")) {
+    if (k === "total_pay") {
+      // Must be a dollar amount that appears in the document.
       const n = moneyToNumber(v);
-      if (n !== null) verified = hayDigits.includes(String(Math.round(n))) && n >= 10;
+      verified = n !== null && n >= 10 && new RegExp("\\$\\s?" + Math.round(n) + "(\\.\\d\\d)?(?!\\d)").test(hayDigits);
+    }
+    if (k === "miles") {
+      // Must be a number that the document ties to the word "miles".
+      const n = moneyToNumber(v);
+      verified = n !== null && /^[\d,.\s]*(mi|miles)?\.?$/i.test(v) && (new RegExp("(?<!\\d)" + Math.round(n) + "\\s*(loaded\\s+)?mi").test(hayDigits) || new RegExp("(miles|distance)[:\\s]+" + Math.round(n) + "(?!\\d)").test(hayDigits));
     }
     facts[k] = { value: v, verified };
   }
