@@ -62,7 +62,7 @@ The test set is eight made-up rate confirmations rendered to PDF, with 89 labele
 
 The keyword baseline did well, and it is worth saying so. Seven regular expressions found 46 of 65 clauses. What they missed was paraphrase. "Carrier shall forfeit $100 of the agreed rate for every hour, or part of an hour, that the vehicle is not at the destination by the required delivery time" contains no "late," no "fee" and no "fine." Gemma flagged it and wrote: "You forfeit $100 for every hour the truck is late." The rules also flagged "Late model, clean and dry equipment is required" as a late-arrival clause. Gemma did not.
 
-The one clause Gemma 4 missed never reached it. "Payment terms: net 30." is four words long, and the pre-filter skips sentences under five words. That is a bug in the filter, and it is still in the benchmarked version.
+The one clause Gemma 4 missed never reached it. "Payment terms: net 30." is four words long, and the pre-filter skipped sentences under five words. After this run I lowered that limit to four and ran the six documents again. Gemma 4 then found 65 of 65. The change also let two total-pay lines through, which it flagged, so false alarms went from 8 to 10. And its reading of the newly found clause was "You have 30 days to pay," which has the direction backwards, the same mistake described next. The table shows the first run, because that is the one scored before anything was changed.
 
 The plain-English lines are the weak part. All 77 lines Gemma 4 wrote for the test documents were read against their quotes. 64 were accurate and 13 were wrong. Nine of the 13 mixed up who pays whom. The quote said "Cedar Gap pays for excessive loading or unloading delay at $45 per hour," and the model wrote "You pay $45 per hour for delays." For a tool whose job is to tell a driver what a clause costs, that is the worst mistake it could make.
 
@@ -92,7 +92,7 @@ I do not have a DevRelay export of the session, so here is the plain account. I 
 
 ## What is next
 
-Nobody has used it on a real load yet, so there is no first-user section in this post. The next step is to run real rate confirmations through it with a working owner-operator watching, and to ask the question this week's theme asks: would you pay for this? After that, in order: fix the short-sentence filter, add OCR for scanned PDFs, and try fine-tuning the 270M model on labeled clauses, since a 270 MB download would suit a phone far better than a 3.1 GB one.
+Nobody has used it on a real load yet, so there is no first-user section in this post. The next step is to run real rate confirmations through it with a working owner-operator watching, and to ask the question this week's theme asks: would you pay for this? After that: add OCR for scanned PDFs, and try fine-tuning the 270M model on labeled clauses, since a 270 MB download would suit a phone far better than a 3.1 GB one.
 
 ## Prize Categories
 

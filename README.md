@@ -39,11 +39,11 @@ Raw outputs are in `bench-results.json`. `node bench-score.mjs test` reproduces 
 
 Three things in these numbers deserve a warning.
 
-The one clause Gemma 4 missed ("Payment terms: net 30.") never reached the model. The pre-filter skips sentences shorter than five words. That is a bug in the filter and it is still in the benchmarked version.
+The one clause Gemma 4 missed ("Payment terms: net 30.") never reached the model, because the pre-filter skipped sentences shorter than five words. After the benchmark the limit was lowered to four and the six documents were run again (`bench-results-after-filter-fix.json`): 65 of 65 found, with 10 false alarms instead of 8, since two total-pay lines now get through and are flagged. The table above is the first run, the one scored before anything was changed. The live app has the fix.
 
 All eight false alarms were instructions with no dollar figure attached, such as "Please do not arrive early at the shipper."
 
-The plain-English lines are less reliable than the flags. All 77 lines Gemma 4 wrote for the test documents were read against their quotes (`meaning-grades.mjs`). 64 were accurate and 13 were wrong. Nine of the 13 mixed up who pays whom, for example reading "Cedar Gap pays for excessive loading or unloading delay at $45 per hour" as "You pay $45 per hour for delays." The app now shows a warning on a card when the quote reads as money paid to the carrier and the model's line says the carrier pays. That check catches 8 of the 13, but it was written after seeing these errors, so it has not been tested on anything new.
+The plain-English lines are less reliable than the flags. All 77 lines Gemma 4 wrote for the test documents were read against their quotes (`meaning-grades.mjs`). 64 were accurate and 13 were wrong. Nine of the 13 mixed up who pays whom, for example reading "Cedar Gap pays for excessive loading or unloading delay at $45 per hour" as "You pay $45 per hour for delays." The app now shows a warning on a card when the quote reads as money paid to the carrier and the model's line says the carrier pays. That check catches 8 of the 13, but it was written after seeing these errors, so it has not been tested on anything new. In the rerun, the model read the newly found "Payment terms: net 30." as "You have 30 days to pay," which is the same mistake, and the check does not catch that one.
 
 Other limits: the test documents were written by the same person who wrote the prompt, so treat the table as a sanity check and not a benchmark. No real broker paperwork has been tested yet. Scanned PDFs are not supported. The app needs WebGPU, and the recommended model is a 3.1 GB download the first time.
 
