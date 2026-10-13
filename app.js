@@ -1,13 +1,13 @@
 // RateCon Radar page logic. Everything here runs in the browser tab.
-import { LABEL_INFO, pdfItemsToText, extractAmounts, missingProtections, exposure, counterNote, moneyToNumber } from "./core.js";
+import { LABEL_INFO, pdfItemsToText, extractAmounts, missingProtections, exposure, counterNote, moneyToNumber, meaningWarning } from "./core.js";
 import * as pdfjs from "./pdf.min.mjs";
 
 pdfjs.GlobalWorkerOptions.workerSrc = new URL("./pdf.worker.min.mjs", import.meta.url).href;
 
 export const MODEL_CHOICES = [
-  { key: "gemma4-e2b", name: "Gemma 4 E2B", size: "3.1 GB download", note: "Most accurate in testing. Apache 2.0 license. Needs a laptop or desktop GPU." },
-  { key: "gemma3-1b", name: "Gemma 3 1B", size: "760 MB download", note: "Faster to download, but it missed more clauses in testing. Gemma license." },
-  { key: "gemma3-270m", name: "Gemma 3 270M", size: "270 MB download", note: "Included for comparison. Too small for this job without fine-tuning." },
+  { key: "gemma4-e2b", name: "Gemma 4 E2B", size: "3.1 GB download", note: "Recommended. Found 64 of 65 money clauses in testing. Apache 2.0 license. Needs a laptop or desktop with WebGPU." },
+  { key: "gemma3-1b", name: "Gemma 3 1B", size: "760 MB download", note: "Smaller download, but it found only 23 of 65 money clauses in testing. Gemma license." },
+  { key: "gemma3-270m", name: "Gemma 3 270M", size: "270 MB download", note: "Here for comparison only. It found 0 of 65 in testing. Too small for this job without fine-tuning." },
 ];
 
 const $ = (id) => document.getElementById(id);
@@ -49,7 +49,7 @@ if (document.getElementById("modelSelect")) main();
 async function main() {
   const state = { worker: null, ready: false, loading: null, busy: false, text: "", flags: [], facts: null, plan: null, pending: null };
 
-  if ("serviceWorker" in navigator && location.protocol === "https:") {
+  if ("serviceWorker" in navigator && (location.protocol === "https:" || ["localhost", "127.0.0.1"].includes(location.hostname))) {
     navigator.serviceWorker.register("./sw.js").catch(() => {});
   }
 
@@ -237,8 +237,10 @@ async function main() {
     const amounts = extractAmounts(f.text).map((a) => a.percent !== undefined ? a.percent + "%" : money(a.value) + (a.perHour ? "/hr" : ""));
     const el = document.createElement("div");
     el.className = "flag"; el.dataset.label = f.label;
+    const warn = meaningWarning(f.text, f.meaning);
     el.innerHTML = `<div class="kind"><span>${esc(LABEL_INFO[f.label].name)}</span><span class="amt">${esc(amounts.join(" · "))}</span></div>
       <p class="meaning">${esc(f.meaning || "Read this clause carefully.")}</p>
+      ${warn ? `<p class="warn">${esc(warn)}</p>` : ""}
       <blockquote>${esc(f.text)}</blockquote>`;
     return el;
   }

@@ -89,6 +89,8 @@ dd.unverified::after { content: " ?"; }
 .flag .kind { font-size: 12px; text-transform: uppercase; letter-spacing: .8px; color: var(--muted); display: flex; justify-content: space-between; gap: 8px; }
 .flag .amt { color: var(--hi); font-weight: 700; letter-spacing: 0; }
 .flag .meaning { font-size: 17px; font-weight: 600; margin: 4px 0 8px; }
+.flag .warn { margin: 0 0 8px; padding: 6px 10px; border-radius: 6px; background: rgba(255, 138, 61, .14); border: 1px solid rgba(255, 138, 61, .5); color: #ffc79f; font-size: 14px; }
+.flag .warn::before { content: "⚠ "; }
 .flag blockquote { margin: 0; padding: 8px 10px; background: #171b1f; border-radius: 6px; font: 13px/1.5 var(--mono); color: #c9d2d9; }
 .empty { color: var(--muted); padding: 12px 0; }
 .stats { color: var(--muted); font-size: 13px; margin-top: 12px; font-family: var(--mono); }

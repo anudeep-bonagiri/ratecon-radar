@@ -304,3 +304,21 @@ export function pdfItemsToText(items) {
   if (p !== null) paras.push(p);
   return paras.join("\n");
 }
+
+// ---------------------------------------------------------------------------
+// Guard on the model's plain-English line. In testing the most common serious
+// mistake was reversing who pays whom. These two checks compare the model's
+// sentence with the quote and return a warning to show on the card.
+// ---------------------------------------------------------------------------
+
+const PAID_TO_CARRIER = /\b(will be paid|is paid|are paid|be paid|pays for|will pay|pays carriers|entitled to|billable|is issued|is made within|remittance|settles|released|expedited payment|payments? requested|compensated)\b/i;
+const YOU_PAY = /\byou (will |must |have to )?pay\b|\bcosts? \$|\bis charged\b|\bcharged \$|\bif you pay\b/i;
+const FEE_WORDS = /\$|%|\b(fee|fees|fine|fined|charg\w*|deduct\w*|penal\w*|forfeit\w*|withh\w*|reduc\w*|drop\w*|billed|taken|cost\w*|non-?payment|not be paid|no payment)\b/i;
+const MEANING_FINE = /\b(fined|fine of|penalt\w*)\b/i;
+
+export function meaningWarning(text, meaning) {
+  if (!meaning) return "";
+  if (PAID_TO_CARRIER.test(text) && YOU_PAY.test(meaning)) return "Check who pays whom. The quote reads as money paid to the carrier.";
+  if (MEANING_FINE.test(meaning) && !FEE_WORDS.test(text)) return "The quote does not name a fine or fee.";
+  return "";
+}

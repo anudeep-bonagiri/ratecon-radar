@@ -8,8 +8,9 @@
   "scripts": {
     "serve": "python3 -m http.server 8765",
     "make-pdfs": "node make-pdfs.mjs",
-    "eval": "node eval-run.mjs onnx-community/gemma-4-E2B-it-ONNX q4 all",
-    "score": "node eval-score.mjs test eval-raw-gemma-4-E2B-it.json eval-raw-gemma-3-1b-it.json eval-raw-gemma-3-270m-it.json"
+    "score": "node bench-score.mjs test",
+    "meaning": "node meaning-check.mjs",
+    "eval-cpu": "node eval-run.mjs onnx-community/gemma-4-E2B-it-ONNX q4 all"
   },
   "devDependencies": {
     "@huggingface/transformers": "4.3.1",
