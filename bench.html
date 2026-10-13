@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RateCon Radar benchmark</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'wasm-unsafe-eval' blob:; worker-src 'self' blob: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net https://huggingface.co https://*.huggingface.co https://*.hf.co; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+</head>
+<body>
+<header class="top"><div class="brand"><div><h1>RateCon Radar benchmark</h1><p class="tag">Runs the labeled test documents through a model in this browser and scores the result.</p></div></div></header>
+<main>
+  <section class="panel">
+    <div class="row wrap">
+      <div class="grow"><label for="bModel">Model</label><select id="bModel"></select></div>
+      <div><label for="bSplit">Documents</label><select id="bSplit"><option value="all">All 8</option><option value="test">6 test only</option><option value="dev">2 dev only</option></select></div>
+      <button id="bRun" class="primary">Run benchmark</button>
+    </div>
+    <div class="progress"><div class="bar" id="bBar"></div></div>
+    <p class="status" id="bStatus">Each model is downloaded the first time it is used. The documents are fictional rate confirmations from eval-docs.mjs.</p>
+  </section>
+  <section class="panel">
+    <h2>Results on the 6 test documents</h2>
+    <table class="bench" id="bTable"><thead><tr><th>System</th><th>Clauses found</th><th>False alarms</th><th>Precision</th><th>Recall</th><th>F1</th><th>Right type</th><th>Load facts</th><th>Time</th></tr></thead><tbody></tbody></table>
+    <p class="hint">Recall is the share of the labeled money clauses that were flagged. "Right type" is the share of found clauses put in the correct category. Load facts are 8 fields per document.</p>
+  </section>
+  <section class="panel">
+    <h2>Log</h2>
+    <pre class="log" id="bLog"></pre>
+    <div class="row wrap"><button id="bCopy" class="ghost">Copy raw results as JSON</button><a id="bDownload" class="hint" download="bench-results.json">Download JSON</a></div>
+  </section>
+</main>
+<script type="module" src="bench.js"></script>
+</body>
+</html>

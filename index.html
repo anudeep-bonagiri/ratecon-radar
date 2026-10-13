@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RateCon Radar: read the fine print before you sign</title>
+<meta name="description" content="Drop in a freight rate confirmation and see every clause that can cost you money. Runs an open-weight Gemma model in your browser. Nothing is uploaded.">
+<!-- The browser enforces this. The page and its worker can only talk to this site,
+     the jsDelivr CDN (library code) and Hugging Face (model weights). There is no
+     other place a document could be sent. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'wasm-unsafe-eval' blob:; worker-src 'self' blob: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net https://huggingface.co https://*.huggingface.co https://*.hf.co; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
+<link rel="stylesheet" href="styles.css">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#14171a">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <svg class="mark" viewBox="0 0 40 40" aria-hidden="true"><circle cx="20" cy="20" r="18" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="20" cy="20" r="10" fill="none" stroke="currentColor" stroke-width="2" opacity=".55"/><path d="M20 20 L33 9" stroke="currentColor" stroke-width="3" stroke-linecap="round"/><circle cx="27" cy="25" r="2.6" fill="currentColor"/></svg>
+    <div>
+      <h1>RateCon Radar</h1>
+      <p class="tag">Read the fine print before you sign.</p>
+    </div>
+  </div>
+  <div class="privacy" id="privacyBadge" title="Enforced by this page's Content Security Policy">
+    <span class="dot"></span> Runs on this device. Nothing is uploaded.
+  </div>
+</header>
+
+<main>
+  <section class="panel" id="modelPanel">
+    <div class="row">
+      <div class="grow">
+        <label for="modelSelect">Model</label>
+        <select id="modelSelect"></select>
+        <p class="hint" id="modelHint"></p>
+      </div>
+      <button id="loadBtn" class="primary">Load model</button>
+    </div>
+    <div class="progress" id="loadProgress" hidden><div class="bar" id="loadBar"></div></div>
+    <p class="status" id="modelStatus">The model downloads once, then stays in this browser for offline use.</p>
+  </section>
+
+  <section class="panel" id="inputPanel">
+    <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a rate confirmation PDF">
+      <input type="file" id="file" accept="application/pdf,.pdf,.txt" hidden>
+      <p class="big">Drop a rate confirmation PDF here</p>
+      <p class="hint">or click to choose a file. Text-based PDFs only for now, not scans.</p>
+    </div>
+    <div class="row wrap samples">
+      <span class="hint">No rate con handy? Try a made-up one:</span>
+      <button class="chip" data-sample="sample-cedar-gap.pdf">Produce load, CA to CO</button>
+      <button class="chip" data-sample="sample-sawgrass.pdf">Retail DC, FL to NC</button>
+      <button class="chip" data-sample="sample-granite-pass.pdf">Oversize step deck, UT to OR</button>
+      <button class="chip ghost" id="pasteToggle">Paste text instead</button>
+    </div>
+    <div id="pasteBox" hidden>
+      <textarea id="pasteText" rows="8" placeholder="Paste the full text of the rate confirmation here"></textarea>
+      <button id="pasteGo" class="primary">Check this text</button>
+    </div>
+  </section>
+
+  <section id="results" hidden>
+    <div class="runbar">
+      <div>
+        <strong id="runTitle">Reading</strong>
+        <span id="runDetail" class="hint"></span>
+      </div>
+      <button id="stopBtn" class="ghost" hidden>Stop</button>
+    </div>
+    <div class="progress"><div class="bar" id="runBar"></div></div>
+
+    <div class="grid">
+      <aside>
+        <div class="card" id="factsCard">
+          <h2>The load</h2>
+          <dl id="facts"></dl>
+          <p class="hint" id="factsNote"></p>
+        </div>
+        <div class="card" id="riskCard">
+          <h2>Money at risk</h2>
+          <div id="risk"></div>
+        </div>
+        <div class="card" id="missingCard">
+          <h2>What is not in writing</h2>
+          <ul id="missing"></ul>
+          <div id="counter" hidden>
+            <p class="hint">Ask for it before you sign. Edit the numbers to match what you charge.</p>
+            <div class="row wrap prefs">
+              <label>Detention $/hr <input type="number" id="prefDet" value="50" min="0"></label>
+              <label>after hrs <input type="number" id="prefFree" value="2" min="0"></label>
+              <label>TONU $ <input type="number" id="prefTonu" value="250" min="0"></label>
+              <label>Layover $/day <input type="number" id="prefLay" value="250" min="0"></label>
+            </div>
+            <textarea id="counterText" rows="9" readonly></textarea>
+            <button id="copyCounter" class="primary">Copy message</button>
+          </div>
+        </div>
+      </aside>
+      <div>
+        <div class="card">
+          <h2>Clauses that can cost you <span class="count" id="flagCount"></span></h2>
+          <p class="hint">The quote is copied from your document. The plain-English line is written by the model, so check it against the quote.</p>
+          <div id="flags"></div>
+          <p class="empty" id="noFlags" hidden>No money clauses found in this document.</p>
+        </div>
+      </div>
+    </div>
+    <p class="stats" id="stats"></p>
+  </section>
+
+  <section class="panel how">
+    <h2>How this works</h2>
+    <ol>
+      <li><strong>Your PDF is read in the browser.</strong> pdf.js pulls the text out. The file never leaves this tab.</li>
+      <li><strong>Gemma reads each sentence.</strong> An open-weight Google Gemma model runs on your own GPU through WebGPU and Transformers.js. It labels each clause and writes one plain line about what it means for you.</li>
+      <li><strong>Every flag shows its source.</strong> The quoted text is taken straight from the document, so you can check the model's reading.</li>
+    </ol>
+    <div class="row wrap">
+      <button id="leakBtn" class="ghost">Run the privacy test</button>
+      <span id="leakOut" class="hint">Tries to send a request to an outside server from this page and from the model's worker. The browser should refuse both.</span>
+    </div>
+    <p class="fine">RateCon Radar is a reading aid, not legal advice. It can miss clauses and it can misread them. Read the document yourself before you sign. Source code and test results: <a href="https://github.com/anudeep-bonagiri/ratecon-radar">github.com/anudeep-bonagiri/ratecon-radar</a>.</p>
+  </section>
+</main>
+
+<script type="module" src="app.js"></script>
+</body>
+</html>

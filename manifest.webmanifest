@@ -1,0 +1,10 @@
+{
+  "name": "RateCon Radar",
+  "short_name": "RateCon Radar",
+  "description": "Read the fine print on a freight rate confirmation before you sign. Runs on your device.",
+  "start_url": "./",
+  "display": "standalone",
+  "background_color": "#14171a",
+  "theme_color": "#14171a",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml" }]
+}
