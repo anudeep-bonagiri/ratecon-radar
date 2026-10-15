@@ -1,5 +1,5 @@
 // Hand grading of the plain-English lines Gemma 4 E2B wrote for the six test
-// documents in bench-results.json. Every flagged sentence (77 of them) was read
+// documents in eval/results/bench-results.json. Every flagged sentence (77 of them) was read
 // against its quote. The entries below are the ones judged wrong; anything not
 // listed was judged an accurate reading.
 //   kind "direction": the line reverses or blurs who pays whom, or names the wrong party

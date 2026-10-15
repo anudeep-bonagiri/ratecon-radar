@@ -26,7 +26,7 @@ Stack: Transformers.js 4.3.1 on WebGPU, pdf.js, plain JavaScript modules, a serv
 
 ## Test results
 
-The test set is eight made-up rate confirmations (`eval-docs.mjs`, rendered to PDF by `make-pdfs.mjs`) with 89 labeled money clauses. Two documents were used while writing the prompt. The numbers below are for the other six, which hold 65 labeled clauses and were scored once after the prompt was frozen. Everything ran in Chrome 154 on an Apple Silicon Mac through `bench.html`, which uses the same worker as the app.
+The test set is eight made-up rate confirmations (`eval/docs.mjs`, rendered to `samples/*.pdf` by `scripts/make-pdfs.mjs`) with 89 labeled money clauses. Two documents were used while writing the prompt. The numbers below are for the other six, which hold 65 labeled clauses and were scored once after the prompt was frozen. Everything ran in Chrome 154 on an Apple Silicon Mac through `bench.html`, which uses the same worker as the app.
 
 | System | Clauses found | False alarms | Precision | Recall | Right category | Load facts | Time per document |
 |---|---|---|---|---|---|---|---|
@@ -35,15 +35,15 @@ The test set is eight made-up rate confirmations (`eval-docs.mjs`, rendered to P
 | Gemma 3 270M, q4f16 (270 MB) | 0 of 65 | 0 | n/a | 0% | n/a | 0 of 48 | 7 s |
 | Keyword rules, no model | 46 of 65 | 13 | 78% | 71% | 72% | n/a | instant |
 
-Raw outputs are in `bench-results.json`. `node bench-score.mjs test` reproduces the table.
+Raw outputs are in `eval/results/bench-results.json`. `npm run score` reproduces the table.
 
 Three things in these numbers deserve a warning.
 
-The one clause Gemma 4 missed ("Payment terms: net 30.") never reached the model, because the pre-filter skipped sentences shorter than five words. After the benchmark the limit was lowered to four and the six documents were run again (`bench-results-after-filter-fix.json`): 65 of 65 found, with 10 false alarms instead of 8, since two total-pay lines now get through and are flagged. The table above is the first run, the one scored before anything was changed. The live app has the fix.
+The one clause Gemma 4 missed ("Payment terms: net 30.") never reached the model, because the pre-filter skipped sentences shorter than five words. After the benchmark the limit was lowered to four and the six documents were run again (`eval/results/bench-results-after-filter-fix.json`): 65 of 65 found, with 10 false alarms instead of 8, since two total-pay lines now get through and are flagged. The table above is the first run, the one scored before anything was changed. The live app has the fix.
 
 All eight false alarms were instructions with no dollar figure attached, such as "Please do not arrive early at the shipper."
 
-The plain-English lines are less reliable than the flags. All 77 lines Gemma 4 wrote for the test documents were read against their quotes (`meaning-grades.mjs`). 64 were accurate and 13 were wrong. Nine of the 13 mixed up who pays whom, for example reading "Cedar Gap pays for excessive loading or unloading delay at $45 per hour" as "You pay $45 per hour for delays." The app now shows a warning on a card when the quote reads as money paid to the carrier and the model's line says the carrier pays. That check catches 8 of the 13, but it was written after seeing these errors, so it has not been tested on anything new. In the rerun, the model read the newly found "Payment terms: net 30." as "You have 30 days to pay," which is the same mistake, and the check does not catch that one.
+The plain-English lines are less reliable than the flags. All 77 lines Gemma 4 wrote for the test documents were read against their quotes (`eval/meaning-grades.mjs`). 64 were accurate and 13 were wrong. Nine of the 13 mixed up who pays whom, for example reading "Cedar Gap pays for excessive loading or unloading delay at $45 per hour" as "You pay $45 per hour for delays." The app now shows a warning on a card when the quote reads as money paid to the carrier and the model's line says the carrier pays. That check catches 8 of the 13, but it was written after seeing these errors, so it has not been tested on anything new. In the rerun, the model read the newly found "Payment terms: net 30." as "You have 30 days to pay," which is the same mistake, and the check does not catch that one.
 
 Other limits: the test documents were written by the same person who wrote the prompt, so treat the table as a sanity check and not a benchmark. No real broker paperwork has been tested yet. Scanned PDFs are not supported. The app needs WebGPU, and the recommended model is a 3.1 GB download the first time.
 
@@ -57,15 +57,36 @@ python3 -m http.server 8765
 
 Open http://localhost:8765 in Chrome or Edge. For the benchmark, open `bench.html`, pick a model and press Run.
 
-The Node scripts (`eval-run.mjs`, `eval-score.mjs`) run the same prompts on CPU with onnxruntime. They need `npm install` first and are slow: about 30 seconds per sentence for Gemma 4 E2B on two cores.
+The Node scripts in `scripts/` run the same prompts on CPU with onnxruntime (`npm run eval-cpu`, then `node scripts/eval-score.mjs test eval/results/eval-raw-*.json`). They need `npm install` first and are slow: about 30 seconds per sentence for Gemma 4 E2B on two cores.
 
-## Files
+## Layout
 
-`core.js` holds the sentence splitter, the filter, both prompts, the parsers, the fact checker and the keyword baseline. `worker.js` loads the model and runs the prompts. `app.js` and `index.html` are the page. `score.js` is the scoring code shared by the browser benchmark and the Node scripts. `sw.js` caches the app for offline use.
+```
+index.html, bench.html   the app and the benchmark page (served by GitHub Pages from the repo root)
+sw.js                    service worker; caches the app shell for offline use
+manifest.webmanifest     PWA manifest
+src/
+  core.js                sentence splitter, filter, both prompts, parsers, fact checker, keyword baseline
+  worker.js              loads the model and runs the prompts (started from a blob URL)
+  app.js                 page logic for index.html
+  bench.js               page logic for bench.html
+  score.js               scoring shared by the browser benchmark and the Node scripts
+assets/                  styles.css, icon.svg
+vendor/pdfjs/            pdf.js build and its license
+samples/                 the eight made-up rate confirmations as PDFs
+eval/
+  docs.mjs               the same eight documents with their clause labels
+  meaning-grades.mjs     hand grading of the plain-English lines
+  results/               raw benchmark outputs and the scored summary
+scripts/                 Node scripts: bench-score, eval-run, eval-score, make-pdfs, meaning-check
+docs/                    the DEV challenge write-up and screenshots
+```
+
+The root files stay at the root on purpose. GitHub Pages serves the site from there, and a service worker can only control pages at or below its own directory.
 
 ## Licenses and credits
 
-Code in this repository is MIT licensed. pdf.js is Apache 2.0 (`pdfjs-LICENSE.txt`). Gemma 4 weights are Apache 2.0. Gemma 3 weights are under Google's Gemma Terms of Use. The ONNX conversions come from the `onnx-community` organization on Hugging Face.
+Code in this repository is MIT licensed. pdf.js is Apache 2.0 (`vendor/pdfjs/LICENSE.txt`). Gemma 4 weights are Apache 2.0. Gemma 3 weights are under Google's Gemma Terms of Use. The ONNX conversions come from the `onnx-community` organization on Hugging Face.
 
 The idea came from owner-operator threads on TruckersReport about fines for arriving early and about what to negotiate on a rate con, and from FreightWaves' guides to reading one.
 

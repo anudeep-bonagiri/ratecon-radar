@@ -9,9 +9,9 @@
      the jsDelivr CDN (library code) and Hugging Face (model weights). There is no
      other place a document could be sent. -->
 <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net 'wasm-unsafe-eval' blob:; worker-src 'self' blob: https://cdn.jsdelivr.net; connect-src 'self' https://cdn.jsdelivr.net https://huggingface.co https://*.huggingface.co https://*.hf.co; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; object-src 'none'; base-uri 'self'; form-action 'none'">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="assets/styles.css">
 <link rel="manifest" href="manifest.webmanifest">
-<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
 <meta name="theme-color" content="#14171a">
 </head>
 <body>
@@ -50,9 +50,9 @@
     </div>
     <div class="row wrap samples">
       <span class="hint">No rate con handy? Try a made-up one:</span>
-      <button class="chip" data-sample="sample-cedar-gap.pdf">Produce load, CA to CO</button>
-      <button class="chip" data-sample="sample-sawgrass.pdf">Retail DC, FL to NC</button>
-      <button class="chip" data-sample="sample-granite-pass.pdf">Oversize step deck, UT to OR</button>
+      <button class="chip" data-sample="samples/cedar-gap.pdf">Produce load, CA to CO</button>
+      <button class="chip" data-sample="samples/sawgrass.pdf">Retail DC, FL to NC</button>
+      <button class="chip" data-sample="samples/granite-pass.pdf">Oversize step deck, UT to OR</button>
       <button class="chip ghost" id="pasteToggle">Paste text instead</button>
     </div>
     <div id="pasteBox" hidden>
@@ -125,6 +125,6 @@
   </section>
 </main>
 
-<script type="module" src="app.js"></script>
+<script type="module" src="src/app.js"></script>
 </body>
 </html>

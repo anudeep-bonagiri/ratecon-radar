@@ -1,9 +1,11 @@
 // Shared helpers for the Node evaluation scripts.
 import fs from "node:fs";
+import { fileURLToPath } from "node:url";
+const at = (p) => fileURLToPath(new URL(p, new URL("../", import.meta.url))); // path from the repo root
 import { getDocument } from "pdfjs-dist/legacy/build/pdf.mjs";
-import { pdfItemsToText, toUnits } from "./core.js";
-import { attachGold } from "./score.js";
-import { DOCS } from "./eval-docs.mjs";
+import { pdfItemsToText, toUnits } from "../src/core.js";
+import { attachGold } from "../src/score.js";
+import { DOCS } from "../eval/docs.mjs";
 
 export async function pdfToText(path) {
   const data = new Uint8Array(fs.readFileSync(path));
@@ -18,7 +20,7 @@ export async function pdfToText(path) {
 }
 
 export async function loadDoc(doc) {
-  const text = await pdfToText(`sample-${doc.id}.pdf`);
+  const text = await pdfToText(at(`samples/${doc.id}.pdf`));
   const units = attachGold(toUnits(text), doc);
   return { text, units };
 }

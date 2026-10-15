@@ -1,10 +1,12 @@
-// Scores bench-results.json (saved from bench.html) with the same scoring code.
-// Usage: node bench-score.mjs [test|dev|all]
+// Scores eval/results/bench-results.json (saved from bench.html) with the same scoring code.
+// Usage: node scripts/bench-score.mjs [test|dev|all]
 import fs from "node:fs";
-import { DOCS } from "./eval-docs.mjs";
-import { scoreFlags, scoreFacts, baselinePick, gateOnlyPick } from "./score.js";
+import { fileURLToPath } from "node:url";
+const at = (p) => fileURLToPath(new URL(p, new URL("../", import.meta.url))); // path from the repo root
+import { DOCS } from "../eval/docs.mjs";
+import { scoreFlags, scoreFacts, baselinePick, gateOnlyPick } from "../src/score.js";
 const split = process.argv[2] || "test";
-const all = JSON.parse(fs.readFileSync("bench-results.json", "utf8"));
+const all = JSON.parse(fs.readFileSync(at("eval/results/bench-results.json"), "utf8"));
 const verbose = process.env.VERBOSE;
 let first = null;
 const out = {};
@@ -25,4 +27,4 @@ for (const [k, v] of Object.entries(out)) {
   if (v.facts) { const { errors, ...ff } = v.facts; console.log("facts", JSON.stringify(ff)); if (verbose) console.log(errors.join("\n")); }
   if (verbose) { console.log("MISSES\n" + misses.join("\n")); console.log("FALSE ALARMS\n" + falseAlarms.join("\n")); }
 }
-fs.writeFileSync(`bench-summary-${split}.json`, JSON.stringify(out, null, 1));
+fs.writeFileSync(at(`eval/results/bench-summary-${split}.json`), JSON.stringify(out, null, 1));

@@ -3,7 +3,7 @@
 import { startWorker, pdfToText, MODEL_CHOICES } from "./app.js";
 import { toUnits } from "./core.js";
 import { attachGold, scoreFlags, scoreFacts, baselinePick } from "./score.js";
-import { DOCS } from "./eval-docs.mjs";
+import { DOCS } from "../eval/docs.mjs";
 
 const $ = (id) => document.getElementById(id);
 const log = (s) => { $("bLog").textContent += s + "\n"; $("bLog").scrollTop = 1e9; };
@@ -43,7 +43,7 @@ async function runModel(key, split) {
     let n = 0;
     for (const doc of docs) {
       $("bStatus").textContent = `${info.repo}: document ${n + 1} of ${docs.length} (${doc.id})`;
-      const text = await pdfToText(await (await fetch(`sample-${doc.id}.pdf`)).arrayBuffer());
+      const text = await pdfToText(await (await fetch(new URL(`../samples/${doc.id}.pdf`, import.meta.url))).arrayBuffer());
       const units = attachGold(toUnits(text), doc);
       const rows = units.map((u) => ({ text: u.text, block: u.block, gold: u.gold, gated: false, label: "NONE" }));
       let facts = null, rawFacts = "";

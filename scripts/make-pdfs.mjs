@@ -1,8 +1,10 @@
-// Renders the synthetic rate confirmations in eval-docs.mjs to PDF files, so the
+// Renders the synthetic rate confirmations in eval/docs.mjs to samples/*.pdf, so the
 // evaluation runs on text pulled back out of a real PDF, the same path the app uses.
 import { chromium } from "playwright";
-import { DOCS } from "./eval-docs.mjs";
+import { DOCS } from "../eval/docs.mjs";
 import fs from "node:fs";
+import { fileURLToPath } from "node:url";
+const at = (p) => fileURLToPath(new URL(p, new URL("../", import.meta.url))); // path from the repo root
 
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/</g, "&lt;");
 function html(doc) {
@@ -41,7 +43,8 @@ const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH 
 const page = await browser.newPage();
 for (const doc of DOCS) {
   await page.setContent(html(doc));
-  await page.pdf({ path: `sample-${doc.id}.pdf`, format: "Letter", printBackground: true });
-  console.log("wrote", `sample-${doc.id}.pdf`, fs.statSync(`sample-${doc.id}.pdf`).size);
+  const out = at(`samples/${doc.id}.pdf`);
+  await page.pdf({ path: out, format: "Letter", printBackground: true });
+  console.log("wrote", out, fs.statSync(out).size);
 }
 await browser.close();

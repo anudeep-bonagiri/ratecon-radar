@@ -1,8 +1,8 @@
 // RateCon Radar page logic. Everything here runs in the browser tab.
 import { LABEL_INFO, pdfItemsToText, extractAmounts, missingProtections, exposure, counterNote, moneyToNumber, meaningWarning } from "./core.js";
-import * as pdfjs from "./pdf.min.mjs";
+import * as pdfjs from "../vendor/pdfjs/pdf.min.mjs";
 
-pdfjs.GlobalWorkerOptions.workerSrc = new URL("./pdf.worker.min.mjs", import.meta.url).href;
+pdfjs.GlobalWorkerOptions.workerSrc = new URL("../vendor/pdfjs/pdf.worker.min.mjs", import.meta.url).href;
 
 export const MODEL_CHOICES = [
   { key: "gemma4-e2b", name: "Gemma 4 E2B", size: "3.1 GB download", note: "Recommended. Found 64 of 65 money clauses in testing. Apache 2.0 license. Needs a laptop or desktop with WebGPU." },
@@ -50,7 +50,7 @@ async function main() {
   const state = { worker: null, ready: false, loading: null, busy: false, text: "", flags: [], facts: null, plan: null, pending: null };
 
   if ("serviceWorker" in navigator && (location.protocol === "https:" || ["localhost", "127.0.0.1"].includes(location.hostname))) {
-    navigator.serviceWorker.register("./sw.js").catch(() => {});
+    navigator.serviceWorker.register(new URL("../sw.js", import.meta.url)).catch(() => {});
   }
 
   // Model picker

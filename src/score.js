@@ -1,4 +1,4 @@
-// Scoring used by both the Node evaluation (eval-score.mjs) and the in-browser
+// Scoring used by both the Node evaluation (scripts/eval-score.mjs) and the in-browser
 // benchmark page (bench.html), so both report numbers computed the same way.
 import { normalize, moneyToNumber, passesGate, keywordJudge } from "./core.js";
 

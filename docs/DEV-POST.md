@@ -2,7 +2,7 @@
 title: "RateCon Radar: Gemma reads a trucker's contract in a browser tab, and the contract never leaves the laptop"
 published: false
 tags: devchallenge, hf26challenge, opensource, ai
-cover_image: https://anudeep-bonagiri.github.io/ratecon-radar/cover.png
+cover_image: https://anudeep-bonagiri.github.io/ratecon-radar/docs/images/cover.png
 ---
 
 *This is a submission for the [Hacktoberfest Open-Source AI Challenge Week 2: Side Hustle](https://dev.to/challenges/hacktoberfest-week2-2026-10-12)*
@@ -17,7 +17,7 @@ A rate confirmation is the one-load contract a freight broker sends a carrier. T
 
 RateCon Radar reads the document before the driver signs it. You drop in the PDF. It pulls out the broker, load number, pay, lane, dates and miles, then lists every clause that can cost you money. Each flag shows the sentence copied from the document, and above it one line in plain English.
 
-![RateCon Radar after reading a sample rate confirmation](https://anudeep-bonagiri.github.io/ratecon-radar/shot-results.png)
+![RateCon Radar after reading a sample rate confirmation](https://anudeep-bonagiri.github.io/ratecon-radar/docs/images/shot-results.png)
 
 It also tells you what is missing. In a 2018 thread called "[Signed Rate Con](https://www.thetruckersreport.com/truckingindustryforum/goto/post?id=7971156)," the original poster argued that detention and TONU (the fee for a truck that is ordered and then cancelled) are the terms worth negotiating load by load. Another poster replied that in about 800 loads that year they had seen exactly one sheet with a carrier's accessorial terms spelled out. So when a confirmation says nothing about detention, layover or TONU, the app drafts the message that asks for them, with rates you can edit.
 
@@ -39,7 +39,7 @@ There is a button at the bottom of the page called "Run the privacy test." It tr
 
 {% github anudeep-bonagiri/ratecon-radar %}
 
-Everything is in the repository: the app, both prompts (`core.js`), the eight test documents with their labels (`eval-docs.mjs`), the raw model outputs from the benchmark (`bench-results.json`) and the grading of the plain-English lines (`meaning-grades.mjs`). `node bench-score.mjs test` reproduces the results table below. The code is MIT licensed.
+Everything is in the repository: the app, both prompts (`src/core.js`), the eight test documents with their labels (`eval/docs.mjs`), the raw model outputs from the benchmark (`eval/results/bench-results.json`) and the grading of the plain-English lines (`eval/meaning-grades.mjs`). `npm run score` reproduces the results table below. The code is MIT licensed.
 
 ## How I Built It
 
@@ -68,7 +68,7 @@ The plain-English lines are the weak part. All 77 lines Gemma 4 wrote for the te
 
 So the app never shows the model's line without the quote under it, and it now runs a check: if the quote reads as money paid to the carrier and the model's line says the carrier pays, the card gets a warning.
 
-![A flag card with a who-pays-whom warning](https://anudeep-bonagiri.github.io/ratecon-radar/shot-warning.png)
+![A flag card with a who-pays-whom warning](https://anudeep-bonagiri.github.io/ratecon-radar/docs/images/shot-warning.png)
 
 That check catches 8 of the 13 bad lines. It was written after seeing those errors, so it has not been tested on anything new.
 

@@ -1,9 +1,11 @@
 // Runs a model over the synthetic rate confirmations and saves raw outputs.
-// Usage: node eval-run.mjs <hf-model-id> <dtype> [dev|test|all]
+// Usage: node scripts/eval-run.mjs <hf-model-id> <dtype> [dev|test|all]
 import fs from "node:fs";
+import { fileURLToPath } from "node:url";
+const at = (p) => fileURLToPath(new URL(p, new URL("../", import.meta.url))); // path from the repo root
 import { pipeline } from "@huggingface/transformers";
 import { loadDoc, DOCS } from "./eval-lib.mjs";
-import { passesGate, judgeMessages, parseJudge, factsMessages, parseFacts } from "./core.js";
+import { passesGate, judgeMessages, parseJudge, factsMessages, parseFacts } from "../src/core.js";
 
 const modelId = process.argv[2] || "onnx-community/gemma-3-270m-it-ONNX";
 const dtype = process.argv[3] || "q4";
@@ -34,9 +36,9 @@ for (const doc of DOCS) {
   const facts = parseFacts(rawFacts, text);
   results.docs.push({ id: doc.id, split: doc.split, rows, rawFacts, facts });
   console.log(doc.id, "done", ((Date.now() - t0) / 1000).toFixed(0) + "s");
-  fs.writeFileSync(`eval-raw-${tag}.json`, JSON.stringify(results, null, 1));
+  fs.writeFileSync(at(`eval/results/eval-raw-${tag}.json`), JSON.stringify(results, null, 1));
 }
 results.seconds = (Date.now() - t0) / 1000;
 results.judgeCalls = calls;
-fs.writeFileSync(`eval-raw-${tag}.json`, JSON.stringify(results, null, 1));
+fs.writeFileSync(at(`eval/results/eval-raw-${tag}.json`), JSON.stringify(results, null, 1));
 console.log("total s", results.seconds, "calls", calls);

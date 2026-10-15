@@ -1,9 +1,11 @@
 // Reports how accurate the model's plain-English lines were (from hand grades)
 // and how many of the wrong ones the meaningWarning() guard catches.
 import fs from "node:fs";
-import { meaningWarning } from "./core.js";
-import { WRONG } from "./meaning-grades.mjs";
-const r = JSON.parse(fs.readFileSync("bench-results.json", "utf8"))["gemma4-e2b"];
+import { fileURLToPath } from "node:url";
+const at = (p) => fileURLToPath(new URL(p, new URL("../", import.meta.url))); // path from the repo root
+import { meaningWarning } from "../src/core.js";
+import { WRONG } from "../eval/meaning-grades.mjs";
+const r = JSON.parse(fs.readFileSync(at("eval/results/bench-results.json"), "utf8"))["gemma4-e2b"];
 let total = 0, wrong = 0, caught = 0, falseWarn = 0;
 const byKind = {};
 const used = new Set();

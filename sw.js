@@ -1,8 +1,9 @@
 // Service worker: keeps the app shell and the library files so RateCon Radar
 // opens with no connection. Model weights are cached separately by Transformers.js.
-const VERSION = "rr-v1";
-const SHELL = ["./", "index.html", "styles.css", "app.js", "core.js", "worker.js", "pdf.min.mjs", "pdf.worker.min.mjs", "manifest.webmanifest", "icon.svg",
-  "sample-cedar-gap.pdf", "sample-sawgrass.pdf", "sample-granite-pass.pdf"];
+const VERSION = "rr-v2";
+const SHELL = ["./", "index.html", "manifest.webmanifest", "assets/styles.css", "assets/icon.svg",
+  "src/app.js", "src/core.js", "src/worker.js", "vendor/pdfjs/pdf.min.mjs", "vendor/pdfjs/pdf.worker.min.mjs",
+  "samples/cedar-gap.pdf", "samples/sawgrass.pdf", "samples/granite-pass.pdf"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));

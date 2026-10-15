@@ -1,8 +1,10 @@
-// Scores saved model outputs against the labels in eval-docs.mjs.
-// Usage: node eval-score.mjs [dev|test|all] file1.json file2.json ...
+// Scores saved model outputs against the labels in eval/docs.mjs.
+// Usage: node scripts/eval-score.mjs [dev|test|all] file1.json file2.json ...
 import fs from "node:fs";
-import { DOCS } from "./eval-docs.mjs";
-import { scoreFlags, scoreFacts, baselinePick, gateOnlyPick } from "./score.js";
+import { fileURLToPath } from "node:url";
+const at = (p) => fileURLToPath(new URL(p, new URL("../", import.meta.url))); // path from the repo root
+import { DOCS } from "../eval/docs.mjs";
+import { scoreFlags, scoreFacts, baselinePick, gateOnlyPick } from "../src/score.js";
 
 const split = process.argv[2] || "test";
 const files = process.argv.slice(3);
@@ -25,4 +27,4 @@ for (const [k, v] of Object.entries(summary)) {
   if (v.facts) { const { errors, ...ff } = v.facts; console.log("facts", JSON.stringify(ff)); if (verbose) console.log(errors.join("\n")); }
   if (verbose) { console.log("MISSES\n" + misses.join("\n")); console.log("FALSE ALARMS\n" + falseAlarms.join("\n")); }
 }
-fs.writeFileSync(`eval-summary-${split}.json`, JSON.stringify(summary, null, 1));
+fs.writeFileSync(at(`eval/results/eval-summary-${split}.json`), JSON.stringify(summary, null, 1));
