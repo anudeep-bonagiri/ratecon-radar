@@ -1,2 +1,4 @@
 node_modules/
 .DS_Store
+eval/results/eval-raw-*.json
+eval/results/eval-summary-*.json
